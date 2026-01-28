@@ -69,7 +69,7 @@
                     enviar(tipo, gps);
                 },
                 () => { enviar(tipo, "GPS denegado"); },
-                { enableHighAccuracy: true, timeout: 5000 }
+                { enableHighAccuracy: true, timeout: 15000 }
             );
         } else { enviar(tipo, "No soportado"); }
     }
@@ -87,4 +87,5 @@
     }
 </script>
 </body>
+
 </html>
