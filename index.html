@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Fajas Magic - GPS</title>
+    <style>
+        body { font-family: -apple-system, sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; min-height: 100vh; margin: 0; }
+        .card { background: white; padding: 25px; border-radius: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 90%; max-width: 360px; text-align: center; }
+        .logo { width: 70px; height: 70px; background: #e6007e; border-radius: 50%; margin: 0 auto 15px; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; border: 3px solid white; box-shadow: 0 4px 10px rgba(0,0,0,0.1); }
+        input { width: 100%; padding: 15px; border: 2px solid #ddd; border-radius: 12px; font-size: 1.8rem; text-align: center; margin-bottom: 10px; outline: none; }
+        .nombre { font-weight: bold; color: #e6007e; margin: 10px 0; font-size: 1.2rem; min-height: 24px;}
+        .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 10px; }
+        button { padding: 16px; border: none; border-radius: 10px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; }
+        .ent { background: #27ae60; grid-column: span 2; }
+        .pau { background: #f39c12; }
+        .sal { background: #d32f2f; grid-column: span 2; }
+        .rei { background: #2980b9; grid-column: span 2; }
+        #msj { margin-top:15px; font-size: 0.9rem; font-weight: bold; color: #666; }
+    </style>
+</head>
+<body>
+<div class="card">
+    <div class="logo">MAGIC</div>
+    <input type="password" id="pin" placeholder="PIN" maxlength="6" oninput="validar()">
+    <div id="nombre" class="nombre"></div>
+    <div id="panel" class="btns" style="display:none"></div>
+    <div id="msj"></div>
+</div>
+
+<script>
+    const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbz4wIO7IQWFGWCoqyxYKDGWQr1TKALiZiJ32QjcM63nE0JEYq6hUv-jxXby3UeRO7XZ/exec"; 
+
+    const staff = {"051185":"Agueda Gonzalez","142127":"Betiana Torres","240402":"Bianca Acosta","130523":"Blanca Ortega","020300":"Chechi Silguero","220491":"David Jara","403020":"David Martinez","160215":"Ethel Caballero","230821":"Guadalupe Vera","171223":"Helen Gomez","146145":"Laura Aquino","326915":"María Torres","568000":"Melanie Blaires","564280":"Natalia Caballero","629334":"Pamela Fernandez","235362":"Raúl Lucena","199200":"Viviana Molas"};
+
+    async function validar() {
+        const val = document.getElementById('pin').value;
+        const n = document.getElementById('nombre');
+        const p = document.getElementById('panel');
+        if (staff[val]) {
+            n.innerText = "Consultando...";
+            try {
+                const r = await fetch(URL_SCRIPT, { method: 'POST', body: JSON.stringify({accion:"consultar", pin:val}) });
+                const estado = await r.text();
+                n.innerText = "👤 " + staff[val];
+                mostrarBotones(estado);
+            } catch (e) { n.innerText = "Error de conexión"; }
+        } else { n.innerText = ""; p.style.display = "none"; }
+    }
+
+    function mostrarBotones(est) {
+        const p = document.getElementById('panel'); p.style.display = "grid"; p.innerHTML = "";
+        if (est === "Salida" || est === "Ninguno") {
+            p.innerHTML = '<button class="ent" onclick="solicitarGps(\'Entrada\')">ENTRADA</button>';
+        } else if (est.includes("Pausa")) {
+            p.innerHTML = '<button class="rei" onclick="solicitarGps(\'Reinicio\')">REINICIO</button>';
+        } else {
+            p.innerHTML = '<button class="pau" onclick="solicitarGps(\'Pausa Baño\')">BAÑO</button><button class="pau" onclick="solicitarGps(\'Pausa Break\')">BREAK</button><button class="pau" onclick="solicitarGps(\'Pausa Almuerzo\')">ALMUERZO</button><button class="sal" onclick="solicitarGps(\'Salida\')">SALIDA</button>';
+        }
+    }
+
+    function solicitarGps(tipo) {
+        document.getElementById('panel').style.display = "none";
+        document.getElementById('msj').innerText = "📍 Obteniendo ubicación...";
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => {
+                    const gps = "https://www.google.com/maps?q=" + pos.coords.latitude + "," + pos.coords.longitude;
+                    enviar(tipo, gps);
+                },
+                () => { enviar(tipo, "GPS denegado"); },
+                { enableHighAccuracy: true, timeout: 5000 }
+            );
+        } else { enviar(tipo, "No soportado"); }
+    }
+
+    async function enviar(tipo, gps) {
+        const val = document.getElementById('pin').value;
+        document.getElementById('msj').innerText = "⏳ Guardando...";
+        const datos = { accion: "registrar", pin: val, nombre: staff[val], tipo: tipo, fecha: new Date().toLocaleDateString(), hora: new Date().toLocaleTimeString(), ubicacion: gps };
+        
+        await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) });
+        
+        document.getElementById('msj').innerText = "✅ MARCACIÓN EXITOSA";
+        document.getElementById('msj').style.color = "green";
+        setTimeout(() => location.reload(), 2000);
+    }
+</script>
+</body>
+</html>
