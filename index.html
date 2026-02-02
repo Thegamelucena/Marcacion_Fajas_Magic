@@ -2,38 +2,100 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Fajas Magic - Marcación</title>
     <style>
-        body { font-family: -apple-system, sans-serif; background: #f4f7f6; display: flex; justify-content: center; align-items: center; height: 100vh; margin: 0; overflow: hidden; }
-        .card { background: white; padding: 40px 30px; border-radius: 25px; box-shadow: 0 15px 35px rgba(0,0,0,0.1); width: 85%; max-width: 380px; text-align: center; }
-        .logo-container { width: 100px; height: 100px; margin: 0 auto 25px; display: flex; align-items: center; justify-content: center; }
-        .logo-container img { max-width: 100%; max-height: 100%; object-fit: contain; }
-        input#pin { width: 100%; padding: 15px 0; border: 2px solid #eee; border-radius: 15px; font-size: 2.2rem; text-align: center; margin-bottom: 20px; outline: none; background: #fafafa; box-sizing: border-box; }
+        /* CSS ACTUALIZADO PARA CENTRADO PERFECTO */
+        body { 
+            font-family: -apple-system, system-ui, sans-serif; 
+            background: #f4f7f6; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center; 
+            height: 100dvh; /* Centrado dinámico en móviles */
+            margin: 0; 
+            overflow: hidden;
+        }
+
+        .card { 
+            background: white; 
+            padding: 25px; 
+            border-radius: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+            width: 88%; 
+            max-width: 340px; 
+            text-align: center;
+            box-sizing: border-box;
+        }
+
+        .logo-container {
+            width: 80px;
+            height: 80px;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .logo-container img {
+            max-width: 100%;
+            height: auto;
+        }
+
+        input#pin { 
+            width: 100%; 
+            padding: 12px;
+            border: 2px solid #eee; 
+            border-radius: 12px; 
+            font-size: 2rem; 
+            text-align: center; 
+            margin-bottom: 15px; 
+            outline: none;
+            background: #fafafa;
+            box-sizing: border-box;
+        }
+
         input#pin:focus { border-color: #e6007e; }
-        .nombre { font-weight: bold; color: #e6007e; margin-bottom: 20px; font-size: 1.3rem; min-height: 30px; }
-        .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        button { padding: 18px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
+
+        .nombre { font-weight: bold; color: #e6007e; margin-bottom: 15px; font-size: 1.1rem; min-height: 25px; }
+        
+        .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        
+        button { 
+            padding: 15px 5px; 
+            border: none; 
+            border-radius: 10px; 
+            color: white; 
+            font-weight: bold; 
+            cursor: pointer; 
+            text-transform: uppercase; 
+            font-size: 0.8rem; 
+        }
+        
         .ent { background: #27ae60; grid-column: span 2; }
         .pau { background: #f39c12; }
         .sal { background: #d32f2f; grid-column: span 2; }
         .rei { background: #2980b9; grid-column: span 2; }
-        #msj { margin-top: 20px; font-size: 1rem; font-weight: bold; color: #666; }
+        
+        #msj { margin-top: 15px; font-size: 0.9rem; font-weight: bold; color: #666; }
     </style>
 </head>
 <body>
 
 <div class="card">
     <div class="logo-container">
-        <img src="https://thegamelucena.github.io/Marcacion_Fajas_Magic/logo.png" alt="Logo Magic">
+        <img src="https://drive.google.com/file/d/1Oiil2YTdSEhgto25g6kO1YYnMEBk_IOQ/view?usp=sharing" alt="Logo Magic">
     </div>
+    
     <input type="password" id="pin" placeholder="PIN" maxlength="6" oninput="validar()" inputmode="numeric">
+    
     <div id="nombre" class="nombre"></div>
     <div id="panel" class="btns" style="display:none"></div>
     <div id="msj"></div>
 </div>
 
 <script>
+    // 1. REEMPLAZA CON TU URL DE GOOGLE SCRIPT
     const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyGNLVVrlvbtOwsZZPQ2bPN49FqRioIM9iPWBMH9jYC3lgtEwSru2f-Cf616lz2Uhg3/exec"; 
     let nombreEmpleado = "";
 
@@ -42,7 +104,7 @@
         const n = document.getElementById('nombre');
         const p = document.getElementById('panel');
         
-        if (pinVal.length >= 4) { // Empieza a buscar a partir de 4 dígitos
+        if (pinVal.length >= 4) {
             n.innerText = "Buscando...";
             try {
                 const r = await fetch(URL_SCRIPT, { method: 'POST', body: JSON.stringify({accion:"consultar", pin:pinVal}) });
@@ -75,7 +137,7 @@
 
     function solicitarGps(tipo) {
         document.getElementById('panel').style.display = "none";
-        document.getElementById('msj').innerText = "📍 Obteniendo ubicación...";
+        document.getElementById('msj').innerText = "📍 Localizando...";
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition(
                 (pos) => enviar(tipo, "https://www.google.com/maps?q=" + pos.coords.latitude + "," + pos.coords.longitude),
@@ -103,6 +165,7 @@
 </script>
 </body>
 </html>
+
 
 
 
