@@ -98,30 +98,35 @@
     const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyGNLVVrlvbtOwsZZPQ2bPN49FqRioIM9iPWBMH9jYC3lgtEwSru2f-Cf616lz2Uhg3/exec"; 
     let nombreEmpleado = "";
 
-    async function validar() {
-        const pinVal = document.getElementById('pin').value;
-        const n = document.getElementById('nombre');
-        const p = document.getElementById('panel');
-        
-        if (pinVal.length >= 4) {
-            n.innerText = "Buscando...";
-            try {
-                const r = await fetch(URL_SCRIPT, { method: 'POST', body: JSON.stringify({accion:"consultar", pin:pinVal}) });
-                const respuesta = await r.text();
-                
-                if (respuesta === "NO_EXISTE") {
-                    n.innerText = "❌ PIN Incorrecto";
-                    p.style.display = "none";
-                } else {
-                    const datos = respuesta.split("|");
-                    nombreEmpleado = datos[0];
-                    const estado = datos[1];
-                    n.innerText = "👤 " + nombreEmpleado;
-                    mostrarBotones(estado);
-                }
-            } catch (e) { n.innerText = "Error de conexión"; }
-        } else { n.innerText = ""; p.style.display = "none"; }
+ async function validar() {
+    const pinVal = document.getElementById('pin').value;
+    const n = document.getElementById('nombre');
+    const p = document.getElementById('panel');
+    
+    // CAMBIO AQUÍ: Solo dispara la búsqueda si el PIN tiene 6 caracteres
+    if (pinVal.length === 6) { 
+        n.innerText = "Buscando...";
+        try {
+            const r = await fetch(URL_SCRIPT, { method: 'POST', body: JSON.stringify({accion:"consultar", pin:pinVal}) });
+            const respuesta = await r.text();
+            
+            if (respuesta === "NO_EXISTE") {
+                n.innerText = "❌ PIN Incorrecto";
+                p.style.display = "none";
+            } else {
+                const datos = respuesta.split("|");
+                nombreEmpleado = datos[0];
+                const estado = datos[1];
+                n.innerText = "👤 " + nombreEmpleado;
+                mostrarBotones(estado);
+            }
+        } catch (e) { n.innerText = "Error de conexión"; }
+    } else { 
+        // Mientras escribe menos de 6, limpiamos mensajes
+        n.innerText = ""; 
+        p.style.display = "none"; 
     }
+}
 
     function mostrarBotones(est) {
         const p = document.getElementById('panel'); p.style.display = "grid"; p.innerHTML = "";
@@ -164,6 +169,7 @@
 </script>
 </body>
 </html>
+
 
 
 
