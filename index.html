@@ -5,85 +5,94 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Fajas Magic - Marcación</title>
     <style>
-        /* CSS ACTUALIZADO PARA CENTRADO PERFECTO */
-        body { 
-            font-family: -apple-system, system-ui, sans-serif; 
-            background: #f4f7f6; 
-            display: flex; 
-            justify-content: center; 
-            align-items: center; 
-            height: 100dvh; /* Centrado dinámico en móviles */
-            margin: 0; 
-            overflow: hidden;
-        }
+    /* Estructura Base */
+    body { 
+        font-family: -apple-system, sans-serif; 
+        background: #f4f7f6; 
+        display: flex; 
+        justify-content: center; 
+        align-items: center; 
+        height: 100dvh; 
+        margin: 0; 
+        overflow: hidden;
+    }
 
-        .card { 
-            background: white; 
-            padding: 25px; 
-            border-radius: 25px; 
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
-            width: 88%; 
-            max-width: 340px; 
-            text-align: center;
-            box-sizing: border-box;
-        }
+    .card { 
+        background: white; 
+        padding: 30px; 
+        border-radius: 25px; 
+        box-shadow: 0 10px 30px rgba(0,0,0,0.1); 
+        width: 90%; 
+        max-width: 360px; /* Tamaño ideal para móvil */
+        text-align: center;
+        box-sizing: border-box;
+    }
 
-        .logo-container {
-            width: 80px;
-            height: 80px;
-            margin: 0 auto 15px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
+    /* Contenedor del Logo Corregido */
+    .logo-container {
+        width: 100px;
+        height: 100px;
+        margin: 0 auto 20px auto; /* Centrado horizontal y margen inferior */
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
 
-        .logo-container img {
-            max-width: 100%;
-            height: auto;
-        }
+    .logo-container img {
+        max-width: 100%;
+        max-height: 100%;
+        object-fit: contain; /* Mantiene la proporción sin deformar */
+    }
 
-        input#pin { 
-            width: 100%; 
-            padding: 12px;
-            border: 2px solid #eee; 
-            border-radius: 12px; 
-            font-size: 2rem; 
-            text-align: center; 
-            margin-bottom: 15px; 
-            outline: none;
-            background: #fafafa;
-            box-sizing: border-box;
-        }
+    /* Cuadro de PIN */
+    input#pin { 
+        width: 100%; 
+        padding: 15px 0;
+        border: 2px solid #eee; 
+        border-radius: 15px; 
+        font-size: 2.2rem; 
+        text-align: center; 
+        margin-bottom: 20px; 
+        outline: none;
+        background: #fafafa;
+        box-sizing: border-box;
+    }
+    
+    /* Nombre del Empleado (Estilo Fajas Magic) */
+    .nombre { 
+        font-weight: bold; 
+        color: #e6007e; 
+        margin-bottom: 20px; 
+        font-size: 1.4rem; 
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 10px;
+    }
 
-        input#pin:focus { border-color: #e6007e; }
+    .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    button { padding: 18px; border: none; border-radius: 12px; color: white; font-weight: bold; cursor: pointer; text-transform: uppercase; font-size: 0.9rem; }
+    .ent { background: #27ae60; grid-column: span 2; }
+    /* ... resto de estilos de botones ... */
+</style>
 
-        .nombre { font-weight: bold; color: #e6007e; margin-bottom: 15px; font-size: 1.1rem; min-height: 25px; }
-        
-        .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-        
-        button { 
-            padding: 15px 5px; 
-            border: none; 
-            border-radius: 10px; 
-            color: white; 
-            font-weight: bold; 
-            cursor: pointer; 
-            text-transform: uppercase; 
-            font-size: 0.8rem; 
-        }
-        
-        .ent { background: #27ae60; grid-column: span 2; }
-        .pau { background: #f39c12; }
-        .sal { background: #d32f2f; grid-column: span 2; }
-        .rei { background: #2980b9; grid-column: span 2; }
-        
-        #msj { margin-top: 15px; font-size: 0.9rem; font-weight: bold; color: #666; }
-    </style>
+<div class="card">
+    <div class="logo-container">
+        <img src="logo.png" alt="Logo Magic">
+    </div>
+    
+    <input type="password" id="pin" placeholder="PIN" maxlength="6" oninput="validar()" inputmode="numeric">
+    
+    <div id="nombre" class="nombre"></div>
+    <div id="panel" class="btns" style="display:none"></div>
+    <div id="msj"></div>
+</div>
 </head>
 <body>
 
 <div class="logo-container">
-    <img src="logo.png" alt="Logo Magic">
+    <img src="logo.jpeg" alt="Logo Magic">
 </div>
     
     <input type="password" id="pin" placeholder="PIN" maxlength="6" oninput="validar()" inputmode="numeric">
@@ -169,6 +178,7 @@
 </script>
 </body>
 </html>
+
 
 
 
