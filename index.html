@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Fajas Magic - Marcación</title>
     <style>
-        /* Centrado Absoluto en Pantalla */
+        /* Centrado Absoluto */
         body { 
             font-family: -apple-system, system-ui, sans-serif; 
             background: #f4f7f6; 
@@ -18,7 +18,6 @@
             overflow: hidden;
         }
 
-        /* La Tarjeta Blanca */
         .card { 
             background: white; 
             padding: 30px; 
@@ -28,16 +27,12 @@
             max-width: 360px; 
             text-align: center;
             box-sizing: border-box;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
         }
 
-        /* Contenedor del Logo */
         .logo-container {
-            width: 110px;
-            height: 110px;
-            margin: 0 auto; 
+            width: 120px;
+            height: 120px;
+            margin: 0 auto 20px;
             display: flex;
             align-items: center;
             justify-content: center;
@@ -49,7 +44,6 @@
             object-fit: contain;
         }
 
-        /* Cuadro de PIN */
         input#pin { 
             width: 100%; 
             padding: 15px 0;
@@ -57,27 +51,22 @@
             border-radius: 15px; 
             font-size: 2.5rem; 
             text-align: center; 
+            margin-bottom: 20px; 
             outline: none;
             background: #fafafa;
             box-sizing: border-box;
-            transition: border-color 0.3s;
         }
 
         input#pin:focus { border-color: #e6007e; }
 
-        /* Nombre del Empleado */
         .nombre { 
             font-weight: bold; 
             color: #e6007e; 
+            margin-bottom: 20px; 
             font-size: 1.4rem; 
             min-height: 1.6rem;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
         }
 
-        /* Botones de Marcación */
         .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         
         button { 
@@ -96,7 +85,7 @@
         .sal { background: #d32f2f; grid-column: span 2; }
         .rei { background: #2980b9; grid-column: span 2; }
         
-        #msj { font-size: 1rem; font-weight: bold; color: #666; margin-top: 5px; }
+        #msj { margin-top: 20px; font-size: 1rem; font-weight: bold; color: #666; }
     </style>
 </head>
 <body>
@@ -118,15 +107,20 @@
     let nombreEmpleado = "";
 
     async function validar() {
-        const pinVal = document.getElementById('pin').value;
+        const pinInput = document.getElementById('pin');
+        const val = pinInput.value;
         const n = document.getElementById('nombre');
         const p = document.getElementById('panel');
         
-        if (pinVal.length === 6) { 
+        // Esperamos a los 6 dígitos exactos
+        if (val.length === 6) { 
             n.innerText = "Buscando...";
             try {
-                const r = await fetch(URL_SCRIPT, { method: 'POST', body: JSON.stringify({accion:"consultar", pin:pinVal}) });
-                const respuesta = await r.text();
+                const response = await fetch(URL_SCRIPT, { 
+                    method: 'POST', 
+                    body: JSON.stringify({accion: "consultar", pin: val}) 
+                });
+                const respuesta = await response.text();
                 
                 if (respuesta === "NO_EXISTE") {
                     n.innerText = "❌ PIN Incorrecto";
@@ -138,7 +132,9 @@
                     n.innerText = "👤 " + nombreEmpleado;
                     mostrarBotones(estado);
                 }
-            } catch (e) { n.innerText = "Error de conexión"; }
+            } catch (e) { 
+                n.innerText = "Error de conexión"; 
+            }
         } else { 
             n.innerText = ""; 
             p.style.display = "none"; 
@@ -187,13 +183,15 @@
             hora: new Date().toLocaleTimeString(), 
             ubicacion: gps 
         };
+        // Cambiamos a 'no-cors' para evitar problemas de seguridad del navegador al enviar
         await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) });
-        document.getElementById('msj').innerHTML = "<span style='color:green'>✅ ¡REGISTRADO!</span>";
+        document.getElementById('msj').innerHTML = "<span style='color:green'>✅ ¡LISTO!</span>";
         setTimeout(() => location.reload(), 2000);
     }
 </script>
 </body>
 </html>
+
 
 
 
