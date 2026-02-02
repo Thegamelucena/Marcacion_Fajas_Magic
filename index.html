@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Fajas Magic - Marcación</title>
     <style>
-        /* Estructura Base - Centrado Perfecto */
+        /* Centrado Absoluto en Pantalla */
         body { 
             font-family: -apple-system, system-ui, sans-serif; 
             background: #f4f7f6; 
@@ -18,6 +18,7 @@
             overflow: hidden;
         }
 
+        /* La Tarjeta Blanca */
         .card { 
             background: white; 
             padding: 30px; 
@@ -27,19 +28,16 @@
             max-width: 360px; 
             text-align: center;
             box-sizing: border-box;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
         }
 
         /* Contenedor del Logo */
         .logo-container {
             width: 110px;
             height: 110px;
-            margin: 0 auto 20px auto; 
+            margin: 0 auto; 
             display: flex;
             align-items: center;
             justify-content: center;
@@ -59,7 +57,6 @@
             border-radius: 15px; 
             font-size: 2.5rem; 
             text-align: center; 
-            margin-bottom: 20px; 
             outline: none;
             background: #fafafa;
             box-sizing: border-box;
@@ -72,12 +69,15 @@
         .nombre { 
             font-weight: bold; 
             color: #e6007e; 
-            margin-bottom: 20px; 
             font-size: 1.4rem; 
             min-height: 1.6rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
 
-        /* Botonera */
+        /* Botones de Marcación */
         .btns { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
         
         button { 
@@ -89,32 +89,29 @@
             cursor: pointer; 
             text-transform: uppercase; 
             font-size: 0.9rem;
-            transition: opacity 0.2s;
         }
-
-        button:active { opacity: 0.7; }
 
         .ent { background: #27ae60; grid-column: span 2; }
         .pau { background: #f39c12; }
         .sal { background: #d32f2f; grid-column: span 2; }
         .rei { background: #2980b9; grid-column: span 2; }
         
-        #msj { margin-top: 20px; font-size: 1rem; font-weight: bold; color: #666; }
+        #msj { font-size: 1rem; font-weight: bold; color: #666; margin-top: 5px; }
     </style>
 </head>
 <body>
 
-<div class="card">
-    <div class="logo-container">
-        <img src="logo.jpeg" alt="Logo Magic">
+    <div class="card">
+        <div class="logo-container">
+            <img src="logo.jpeg" alt="Logo Magic">
+        </div>
+        
+        <input type="password" id="pin" placeholder="PIN" maxlength="6" oninput="validar()" inputmode="numeric">
+        
+        <div id="nombre" class="nombre"></div>
+        <div id="panel" class="btns" style="display:none"></div>
+        <div id="msj"></div>
     </div>
-    
-    <input type="password" id="pin" placeholder="PIN" maxlength="6" oninput="validar()" inputmode="numeric">
-    
-    <div id="nombre" class="nombre"></div>
-    <div id="panel" class="btns" style="display:none"></div>
-    <div id="msj"></div>
-</div>
 
 <script>
     const URL_SCRIPT = "https://script.google.com/macros/s/AKfycbyGNLVVrlvbtOwsZZPQ2bPN49FqRioIM9iPWBMH9jYC3lgtEwSru2f-Cf616lz2Uhg3/exec"; 
@@ -125,7 +122,6 @@
         const n = document.getElementById('nombre');
         const p = document.getElementById('panel');
         
-        // Solo dispara la búsqueda si el PIN tiene exactamente 6 caracteres
         if (pinVal.length === 6) { 
             n.innerText = "Buscando...";
             try {
@@ -166,6 +162,39 @@
                 <button class="sal" onclick="solicitarGps('Salida')">SALIDA</button>
             `;
         }
+    }
+
+    function solicitarGps(tipo) {
+        document.getElementById('panel').style.display = "none";
+        document.getElementById('msj').innerText = "📍 Localizando...";
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(
+                (pos) => enviar(tipo, "https://www.google.com/maps?q=" + pos.coords.latitude + "," + pos.coords.longitude),
+                () => enviar(tipo, "GPS denegado"),
+                { enableHighAccuracy: true, timeout: 15000 }
+            );
+        } else { enviar(tipo, "No soportado"); }
+    }
+
+    async function enviar(tipo, gps) {
+        document.getElementById('msj').innerText = "⏳ Guardando...";
+        const datos = { 
+            accion: "registrar", 
+            pin: document.getElementById('pin').value, 
+            nombre: nombreEmpleado, 
+            tipo: tipo, 
+            fecha: new Date().toLocaleDateString(), 
+            hora: new Date().toLocaleTimeString(), 
+            ubicacion: gps 
+        };
+        await fetch(URL_SCRIPT, { method: 'POST', mode: 'no-cors', body: JSON.stringify(datos) });
+        document.getElementById('msj').innerHTML = "<span style='color:green'>✅ ¡REGISTRADO!</span>";
+        setTimeout(() => location.reload(), 2000);
+    }
+</script>
+</body>
+</html>
+
 
 
 
