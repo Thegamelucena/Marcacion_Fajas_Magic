@@ -107,39 +107,49 @@
     let nombreEmpleado = "";
 
     async function validar() {
-        const pinInput = document.getElementById('pin');
-        const val = pinInput.value;
-        const n = document.getElementById('nombre');
-        const p = document.getElementById('panel');
-        
-        // Esperamos a los 6 dígitos exactos
-        if (val.length === 6) { 
-            n.innerText = "Buscando...";
-            try {
-                const response = await fetch(URL_SCRIPT, { 
-                    method: 'POST', 
-                    body: JSON.stringify({accion: "consultar", pin: val}) 
-                });
-                const respuesta = await response.text();
-                
-                if (respuesta === "NO_EXISTE") {
-                    n.innerText = "❌ PIN Incorrecto";
-                    p.style.display = "none";
+    const pinVal = document.getElementById('pin').value;
+    const n = document.getElementById('nombre');
+    const p = document.getElementById('panel');
+    const m = document.getElementById('msj'); // Referencia al div de mensajes
+
+    if (pinVal.length === 6) { 
+        n.innerText = "Buscando...";
+        try {
+            const r = await fetch(URL_SCRIPT, { method: 'POST', body: JSON.stringify({accion:"consultar", pin:pinVal}) });
+            const respuesta = await r.text();
+            
+            if (respuesta === "NO_EXISTE") {
+                n.innerText = "❌ PIN Incorrecto";
+                p.style.display = "none";
+                m.innerHTML = ""; // Limpiar si había historial
+            } else {
+                // AQUÍ ESTÁ EL CAMBIO IMPORTANTE:
+                const datos = respuesta.split("|");
+                nombreEmpleado = datos[0];
+                const estado = datos[1];
+                const historial = datos[2]; // <--- La nueva parte del ADMIN
+
+                n.innerText = "👤 " + nombreEmpleado;
+                mostrarBotones(estado);
+
+                // Lógica para mostrar la Vista de Control solo si hay historial (es ADMIN)
+                if (historial && historial.trim() !== "") {
+                    m.innerHTML = `
+                        <div style="background:#f0f0f0; padding:15px; border-radius:15px; text-align:left; font-size:0.85rem; max-height:250px; overflow-y:auto; margin-top:15px; border:1px solid #ddd; color: #333;">
+                            <b style="color:#e6007e; display:block; margin-bottom:8px; border-bottom:1px solid #ccc;">Control de Hoy:</b>
+                            ${historial.split(", ").map(h => `<div style="margin-bottom:4px; border-bottom:1px dotted #ccc;">• ${h}</div>`).join("")}
+                        </div>`;
                 } else {
-                    const datos = respuesta.split("|");
-                    nombreEmpleado = datos[0];
-                    const estado = datos[1];
-                    n.innerText = "👤 " + nombreEmpleado;
-                    mostrarBotones(estado);
+                    m.innerHTML = ""; // Si es USER, no mostramos nada
                 }
-            } catch (e) { 
-                n.innerText = "Error de conexión"; 
             }
-        } else { 
-            n.innerText = ""; 
-            p.style.display = "none"; 
-        }
+        } catch (e) { n.innerText = "Error de conexión"; }
+    } else { 
+        n.innerText = ""; 
+        p.style.display = "none";
+        m.innerHTML = ""; 
     }
+}
 
     function mostrarBotones(est) {
         const p = document.getElementById('panel'); 
@@ -191,6 +201,7 @@
 </script>
 </body>
 </html>
+
 
 
 
